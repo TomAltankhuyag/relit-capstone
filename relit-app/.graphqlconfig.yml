@@ -1,0 +1,20 @@
+projects:
+  relitapp:
+    schemaPath: amplify/backend/api/relitapp/build/schema.graphql
+    includes:
+      - graphql/**/*.ts
+    excludes:
+      - ./amplify/**
+      - graphql/API.ts
+      - graphql/customAPI.ts
+    extensions:
+      amplify:
+        codeGenTarget: typescript
+        generatedFileName: graphql/API.ts
+        docsFilePath: graphql
+        region: us-west-2
+        apiId: null
+        maxDepth: 2
+extensions:
+  amplify:
+    version: 3

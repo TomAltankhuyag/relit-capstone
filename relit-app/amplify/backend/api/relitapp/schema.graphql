@@ -1,0 +1,112 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+"""
+A user profile.
+"""
+type User @model {
+    userID: ID! @primaryKey
+    email: String! @index
+    username: String!
+    password: String!
+    salt: String!
+    groups: [Group!]! @hasMany(indexName: "byUser", fields: ["userID"])
+    devices: [Device!]! @manyToMany(relationName: "userDevices")
+    defaultGroupID: ID!
+}
+
+"""
+A group of devices.
+"""
+type Group @model {
+    groupID: ID! @primaryKey
+    name: String!
+    devices: [Device!] @manyToMany(relationName: "groupDevices")
+    userID: ID! @index(name: "byUser")
+    groupConfigs: [GroupConfig!]! @hasMany
+    groupPresets: [GroupPreset!]! @hasMany
+}
+
+"""
+Saved presets (blanket configuration) of devices in a group.
+"""
+type GroupPreset @model {
+    name: String!
+    preset: SavedPreset!
+}
+
+type SavedPreset {
+    type: DeviceType!
+    config: Config!
+}
+
+"""
+Saved configurations of devices in a group.
+"""
+type GroupConfig @model {
+    name: String!
+    configs: [SavedConfig!]!
+}
+
+"""
+A saved configuration of a device.
+"""
+type SavedConfig {
+    deviceID: String!
+    type: DeviceType!
+    config: Config!
+}
+# not a model, thus can't link to device, meaning manually set deviceID
+# not an issue as not trying to get device from this in a query
+
+
+"""
+An IoT device.
+"""
+type Device @model {
+    deviceID: ID! @primaryKey
+    hubID: ID!
+    name: String! @index
+    type: DeviceType!
+    users: [User!]! @manyToMany(relationName: "userDevices",)
+    config: Config!
+    groups: [Group!]! @manyToMany(relationName: "groupDevices")
+}
+
+# can't use @model on interface, thus have to do this (Config is a union)
+# not the best design,
+# but is the best current solution to be able to create a single table of many device types
+
+enum DeviceType {
+    WhiteLight
+    RGBLight
+    RGBWLight
+}
+
+# unified single config type that has all possible configurations that can be saved
+# up to app to only request configurations that it needs depending on device type
+# downside is initial user load, will have lots of null requested (for configs not stored)
+# due to not knowing type of device when querying all
+type Config {
+    voltage: Int
+    red: Int
+    green: Int
+    blue: Int
+    white: Boolean
+}
+
+# up to app to only store configurations it will use
+input ConfigInput {
+    voltage: Int
+    red: Int
+    green: Int
+    blue: Int
+    white: Boolean
+}
+
+
+# union type for config not working as at runtime, unable to get config due to not knowing/storing
+#__typename within Config object (not sure how to fix this)
+# most likely an issue with Config input being a union type,
+# thus unable to know which type of config was added to device

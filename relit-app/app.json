@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "relit-app",
+    "slug": "relit-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/relit-logo.png",
+    "scheme": "myapp",
+    "entryPoint": "./app/index.tsx",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/relit-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/relit-logo.png",
+        "backgroundColor": "#ffffff",
+        "package": "com.yourcompany.yourappname",
+        "versionCode": 1
+      },
+      "package": "com.fdil.relitapp"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/relit-logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
