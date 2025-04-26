@@ -1,19 +1,19 @@
 
-import React, {useState, useEffect, useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Pressable, Text, View, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import {useAppDispatch, useAppSelector} from "@/lib/hooks";
+import { useAppDispatch, useAppSelector} from "@/lib/hooks";
 import Accordion from "react-native-collapsible/Accordion";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { selectGroups } from "@/lib/features/groups/groupsSlice";
-import {selectDevices, updateDevice} from "@/lib/features/devices/devicesSlice";
+import { selectDevices, updateDevice } from "@/lib/features/devices/devicesSlice";
 import { Group } from "@/lib/features/groups/groupsTypes";
 import { DeviceType } from "@/graphql/API";
 import { GroupPreset } from "@/lib/features/groups/groupsTypes";
-import {Config, Device} from "@/lib/features/devices/devicesTypes";
+import { Config, Device } from "@/lib/features/devices/devicesTypes";
 import ReanimatedButton from "@/components/ReanimatedButton";
 import Animated, { FadeInUp, FadeOutDown, FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { colorKit } from "reanimated-color-picker";
@@ -41,41 +41,42 @@ export default function LightsManager() {
   const pubSub = useContext(PubSubContext);
   const dispatch = useAppDispatch()
 
-  useEffect(() => {
-    pubSub.subscribe({ topics: "update/db/device" }).subscribe({
-      next: (data) => {
-        console.log("Message received", data);
+    useEffect(() => {
+      pubSub.subscribe({ topics: "update/db/device" }).subscribe({
+        next: (data) => {
+          console.log("Message received", data);
 
-        // data is assumed to have attributes:
-        // deviceID, name, type, config, hubID, __typename (won't be using them all)
+          // data is assumed to have attributes:
+          // deviceID, name, type, config, hubID, __typename (won't be using them all)
 
-        // only plan on using deviceID, name, config (for now, can be updated later)
+          // only plan on using deviceID, name, config (for now, can be updated later)
 
-        const deviceID: string = data.deviceID as string;
+          const deviceID: string = data.deviceID as string;
 
-        // first find device
+          // first find device
 
-        const device = allDevices.find(d => d.deviceID === deviceID)
+          const device = allDevices.find(d => d.deviceID === deviceID)
 
-        if (!device) {
-          // ignore if device not found, fired from a device that this user doesn't own
-          return
-        }
+          if (!device) {
+            // ignore if device not found, fired from a device that this user doesn't own
+            return
+          }
 
-        // update device
-        const name: string = data.name as string;
-        const config: Config = data.config as Config;
-        const updatedDevice: Device = {
-          ...device,
-          name,
-          config
-        }
-        dispatch(updateDevice({ device: updatedDevice }));
-      },
-      error: (error) => console.log(error),
-      complete: () => console.log("Unsubscribed to update/db/device (unexpected occurance)"),
-    });
-  }, [pubSub]);
+          // update device
+          const name: string = data.name as string;
+          const config: Config = data.config as Config;
+          const updatedDevice: Device = {
+            ...device,
+            name,
+            config
+          }
+          dispatch(updateDevice({ device: updatedDevice }));
+        },
+        error: (error) => console.log(error),
+        complete: () => console.log("Unsubscribed to update/db/device (unexpected occurance)"),
+      });
+    }, [pubSub]);
+
   // creating sections
   const SECTIONS: Section[] = groups.map((group: Group) => ({
     title: group.name,

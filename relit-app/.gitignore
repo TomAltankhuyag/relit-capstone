@@ -23,6 +23,12 @@ expo-env.d.ts
 
 amplify/team-provider-info.json
 
+
+android
+.env
+*/graphiql.tsx
+ios
+
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
@@ -43,9 +49,4 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 **.sample
-shim.js
 #amplify-do-not-edit-end
-
-android
-.env
-*/graphiql.tsx

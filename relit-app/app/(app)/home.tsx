@@ -11,6 +11,7 @@ import { logout, selectUser } from "@/user/userSlice";
 import { PubSubContext } from "@/components/PubSubProvider";
 import ReanimatedButton from "@/components/ReanimatedButton";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
+import {handleSignOut} from "@/components/aws-auth";
 
 export default function Home() {
   const pubSub = useContext(PubSubContext);
@@ -28,8 +29,9 @@ export default function Home() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  function handleLogOut() {
+  async function handleLogOut() {
     dispatch(logout());
+    await handleSignOut()
     router.navigate("/welcome");
   }
 

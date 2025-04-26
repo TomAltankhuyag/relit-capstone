@@ -19,6 +19,7 @@ import {
 } from "@/lib/features/shared";
 import {Config, DevicesState, Device, } from "@/devices/devicesTypes";
 import { DeviceType } from '@/graphql/API';
+
 const initialState: DevicesState = {
   devices: [
     {
@@ -131,7 +132,7 @@ const initialState: DevicesState = {
       },
       group_ids: []
     } as Device,
-  ] 
+  ]
 }
 
 export const devicesSlice = createSlice({

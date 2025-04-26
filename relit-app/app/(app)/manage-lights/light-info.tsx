@@ -177,7 +177,7 @@ export default function LightInfo() {
     console.log("dispatching updated device:", updatedDevice);
     dispatch(updateDevice({ device: updatedDevice }));
 
-    // also update device info on db (most convienient to do this here instead of handleAWS)
+    // also update device info on db (most convenient to do this here instead of handleAWS)
     // send db update using a pub
     const db_update_msg = {
       deviceID,
@@ -199,7 +199,7 @@ export default function LightInfo() {
       console.error("Error publishing message:", error);
     }
   }
-
+ 
   const onRainbowPress = (previousState) => {
     setIsRainbowMode(previousState => !previousState)
 
@@ -226,26 +226,28 @@ export default function LightInfo() {
   }
 
   async function handleAWS(hexcode, brightness, toggle_white) {
-    console.log(`sending with hex: ${hexcode}, brightness: ${brightness}, toggle_white: ${toggle_white}`);
+    console.log(
+      `sending with hex: ${hexcode}, brightness: ${brightness}, toggle_white: ${toggle_white}`
+    );
     const message = {
-      "desired": {
-        "welcome": "aws-iot",
-        "voltage": 15,
-        "dimness": 20,
-        "id": "1234",
-        "hexcode": `${hexcode}`,
-        "toggle": `${toggle_white}`,
-        "brightness": `${brightness}`,
-        "brightness_direction": "-1",
-        "rainbow_toggle": `${isRainbowMode ? '1' : '0'}`
+      desired: {
+        welcome: "aws-iot",
+        voltage: 15,
+        dimness: 20,
+        id: "1234",
+        hexcode: `${hexcode}`,
+        toggle: `${toggle_white}`,
+        brightness: `${brightness}`,
+        brightness_direction: "-1",
+        rainbow_toggle: `${isRainbowMode ? "1" : "0"}`,
       },
-    }
+    };
     try {
       await pubSub.publish({ topics: ["config/BTHubThing"], message });
       console.log("Message sent!111222");
     } catch (error) {
       console.error("Error publishing message:", error);
-    }
+    }    
   }
   return (
     <Animated.View

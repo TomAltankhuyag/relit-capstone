@@ -1,29 +1,29 @@
 // Route where user is asked to login or signup
 // Bonus: Remember last login details?
 
-import React, {useEffect} from "react"
-import { Pressable, Text, View, ImageBackground, StyleSheet } from "react-native"
-import { useRouter } from "expo-router"
+import React from "react"
+import { Text, View, ImageBackground, StyleSheet } from "react-native"
+import { useRouter, Redirect } from "expo-router"
 import {
-  buttonStyling,
   generalStyling,
-  FONT_COLOR_PRIMARY,
-  FONT_COLOR_SECONDARY,
 } from "@/assets/styles/styles"
 import {useAppSelector} from "@/lib/hooks";
-import {selectUser} from "@/user/userSlice";
-import {selectGroups} from "@/groups/groupsSlice";
-import {selectDevices} from "@/devices/devicesSlice";
+import {selectLoggedIn} from "@/user/userSlice";
 import ReanimatedButton from "@/components/ReanimatedButton";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 
 export default function Welcome() {
-  console.log(useAppSelector(state => selectUser(state)))
-  console.log(useAppSelector(state => selectGroups(state)))
-  console.log(useAppSelector(state => selectDevices(state)))
+  // console.log(useAppSelector(state => selectUser(state)))
+  // console.log(useAppSelector(state => selectGroups(state)))
+  // console.log(useAppSelector(state => selectDevices(state)))
 
 
   const router = useRouter()
+
+  const isLoggedIn = useAppSelector(selectLoggedIn);
+
+  if (isLoggedIn) return <Redirect href="/home" />;
+
   return (
     <Animated.View
           entering={FadeInDown.duration(800)}

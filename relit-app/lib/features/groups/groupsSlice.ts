@@ -312,14 +312,14 @@ export const groupsSlice = createSlice({
         const deviceID = action.payload.deviceID;
 
         // first check if device in default group, as need to remove it from there
-        const defaultGroupID = state.default_id
-        const defaultGroup = state.groups.find(group => group.groupID === defaultGroupID)
-        if (defaultGroup && defaultGroup.device_ids.includes(deviceID)) {
-          const index = defaultGroup.device_ids.indexOf(deviceID);
-          if (index !== -1) {
-            defaultGroup.device_ids.splice(index, 1);
-          }
-        }
+        // const defaultGroupID = state.default_id
+        // const defaultGroup = state.groups.find(group => group.groupID === defaultGroupID)
+        // if (defaultGroup && defaultGroup.device_ids.includes(deviceID)) {
+        //   const index = defaultGroup.device_ids.indexOf(deviceID);
+        //   if (index !== -1) {
+        //     defaultGroup.device_ids.splice(index, 1);
+        //   }
+        // }
 
         // add device to group
         const group = state.groups.find(group => group.groupID === groupID)
@@ -341,13 +341,13 @@ export const groupsSlice = createSlice({
         }
 
         // if the device was in 1 group (before removal from it), add device to default group
-        if (action.payload.num_groups_device_in === 1) {
-          const defaultGroupID = state.default_id
-          const defaultGroup = state.groups.find(group => group.groupID === defaultGroupID)
-          if (defaultGroup && !defaultGroup.device_ids.includes(deviceID)) {
-            defaultGroup.device_ids.push(deviceID);
-          }
-        }
+        // if (action.payload.num_groups_device_in === 1) {
+        //   const defaultGroupID = state.default_id
+        //   const defaultGroup = state.groups.find(group => group.groupID === defaultGroupID)
+        //   if (defaultGroup && !defaultGroup.device_ids.includes(deviceID)) {
+        //     defaultGroup.device_ids.push(deviceID);
+        //   }
+        // }
       })
       .addCase(createUserAction, (state, action) => {
         // should user login automatically after creating account? if not, then no local changes.

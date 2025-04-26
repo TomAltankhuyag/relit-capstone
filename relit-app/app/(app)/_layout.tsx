@@ -7,7 +7,7 @@ import { View } from "react-native";
 export default function AppLayout() {
   const isLoggedIn = useAppSelector(selectLoggedIn);
 
-  if (!isLoggedIn) return <Redirect href="/login" />;
+  if (!isLoggedIn) return <Redirect href="/welcome" />;
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000' }}>

@@ -15,7 +15,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.fdil.relitapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +25,22 @@
         "package": "com.yourcompany.yourappname",
         "versionCode": 1
       },
-      "package": "com.fdil.relitapp"
+      "package": "com.fdil.relitapp",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "otpauth"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

@@ -2,18 +2,15 @@ import React, { useState } from "react"
 import { Text, View, Pressable, TextInput, StyleSheet } from "react-native"
 import { useRouter } from "expo-router"
 import { useAppDispatch } from "@/lib/hooks"
-import { login } from "@/user/userSlice"
-import { initAction, InitPayload } from "@/lib/features/shared"
 import AntDesign from "@expo/vector-icons/AntDesign"
 import { Amplify } from "aws-amplify"
 import { generateClient } from "aws-amplify/api"
-import searchUsernameQuery from "@/graphql/searchUsernameQuery"
-import getAllUserData from "@/graphql/getAllUserDataQuery"
-import { checkPassword } from "@/components/password-hash"
 import awsconfig from "@amplifyconfig"
 import ReanimatedButton from "@/components/ReanimatedButton"
-import Animated, { FadeInDown, FadeOutDown, SlideOutRight, SlideInLeft } from "react-native-reanimated"
-
+import Animated, { FadeInDown, FadeOutDown} from "react-native-reanimated"
+import {handleSignInNextSteps} from "@/components/aws-auth";
+import { AuthError, signIn } from 'aws-amplify/auth'
+import ConfirmSignUpPage from "@/components/confirmSignUp"
 
 Amplify.configure(awsconfig)
 const client = generateClient()
@@ -24,111 +21,31 @@ export default function Login() {
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [error, setError] = useState<string>("")
+  const [confirmFlag, setConfirmFlag] = useState(false)
+
 
   async function handlePress() {
-    console.log(
-      `Pressed Login with following info: username:${username}, password:${password}`
-    )
-    // if there was an error, either succeed in login (thus change page)
-    // or replace with new error.
-    // means we don't have to clear error everytime press button
-
-    // query db
-    let users
     try {
-      users = await client.graphql({
-        query: searchUsernameQuery,
-        variables: {
-          username,
-        },
-        // improvement to this query for scale of users is doing the query with pagination
-        // at the moment this query every user with username
-
-        // can slow networking a lot if there is a lot of said username in database
-      })
-    } catch (e) {
-      console.error(e)
-      setError("Unable to access Database.")
-      return
-    }
-    console.log("Queried database for users.")
-    console.log(users.data.listUsers?.items)
-
-    if (!users.data.listUsers?.items) {
-      setError("Server Error with Connection to Database")
-      return
-    }
-
-    if (users.data.listUsers.items.length === 0) {
-      setError("Username not found")
-      return
-    }
-
-    // found at least 1 user, check all against all their passwords
-    /* the userID for the user whose password matched */
-    let matchingUserID: string | null = null
-    for (const item of users.data.listUsers.items) {
-      // ignore null results
-      if (!item) continue
-
-      const result = await checkPassword(password, item.password, item.salt)
-      console.log(result)
-      if (result) {
-        matchingUserID = item.userID
+      const output = await signIn({
+        username,
+        password
+      });
+      console.log(`signIn next set: ${output.nextStep.signInStep}`)
+      if (output.nextStep.signInStep === 'CONFIRM_SIGN_UP') {
+        setConfirmFlag(true)
+        return
       }
+
+      await handleSignInNextSteps(output);
+      router.push('/loginTOTP')
+    } catch (error) {
+      if (error instanceof AuthError) {
+        setError(error.message)
+      }
+      console.log(error);
     }
-
-    if (!matchingUserID) {
-      setError("Incorrect Password")
-      return
-    }
-    // // found userID to grab info from db
-    // let data
-    // try {
-    //   data = await client.graphql({
-    //     query: getAllUserData,
-    //     variables: {
-    //       userID: matchingUserID,
-    //     },
-    //   })
-    // } catch (e) {
-    //   console.error(e)
-    //   setError("Internal Error")
-    //   return
-    // }
-    // console.log("Got user data")
-    // const user_data = data.data
-
-    // console.log(user_data)
-    // if (
-    //   !user_data.getUser ||
-    //   !user_data.userDevicesByUserUserID ||
-    //   !user_data.userDevicesByUserUserID
-    // ) {
-    //   setError("Server Error: Unable to fetch user data")
-    //   return
-    // }
-
-    dispatch(login())
-    console.log("Reached login")
-
-    // const initPayload: InitPayload = {
-    //   userID: matchingUserID,
-    //   data: user_data,
-    // }
-    // try {
-    //   dispatch(initAction(initPayload))
-    // } catch (e) {
-    //   console.error(e)
-    //   setError("Internal Error during user data init")
-    //   return
-    // }
-
-    // console.log("Dispatched initAction!")
-
-    router.navigate("/home")
-    // should be batched by default as using react 18 (only 1 re-render)
   }
+
 
   return (
     <Animated.View
@@ -148,31 +65,33 @@ export default function Login() {
           <Text style={styles.headerText}>Login</Text>
         </View>
       </View>
-      {/* login inputs */}
-      <View>
-        {error !== "" && <Text style={{ color: "red" }}>{error}</Text>}
-        <TextInput
-          style={styles.inputStyling}
-          placeholder="Username"
-          onChangeText={setUsername}
-          value={username}
-          autoCapitalize="none"
-          placeholderTextColor={"#fff"}
-        />
-        <TextInput
-          style={styles.inputStyling}
-          placeholder="Password"
-          onChangeText={setPassword}
-          value={password}
-          secureTextEntry
-          autoCapitalize="none"
-          placeholderTextColor={"#fff"}
-        />
-      </View>
-      {/* <Pressable style={styles.loginButton} onPress={handlePress}>
-        <Text style={styles.buttonText}>Login</Text>
-      </Pressable> */}
-      <ReanimatedButton onPress={handlePress} label="Login" />
+      {!confirmFlag ?
+      <>
+        {/* login inputs */}
+        <View>
+          {error !== "" && <Text style={{ color: "red" }}>{error}</Text>}
+          <TextInput
+            style={styles.inputStyling}
+            placeholder="Username"
+            onChangeText={setUsername}
+            value={username}
+            autoCapitalize="none"
+            placeholderTextColor={"#fff"}
+          />
+          <TextInput
+            style={styles.inputStyling}
+            placeholder="Password"
+            onChangeText={setPassword}
+            value={password}
+            secureTextEntry
+            autoCapitalize="none"
+            placeholderTextColor={"#fff"}
+          />
+        </View>
+        <ReanimatedButton onPress={handlePress} label="Login" />
+      </> :
+      <ConfirmSignUpPage username={username} />
+    }
     </Animated.View>
   )
 }

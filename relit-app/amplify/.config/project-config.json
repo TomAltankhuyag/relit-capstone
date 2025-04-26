@@ -1,5 +1,7 @@
 {
-  "whyContinueWithGen1": "Gen 2 is missing features I need from Gen 1",
+  "providers": [
+    "awscloudformation"
+  ],
   "projectName": "relitapp",
   "version": "3.1",
   "frontend": "javascript",
@@ -8,11 +10,8 @@
     "config": {
       "SourceDir": "/",
       "DistributionDir": "/",
-      "BuildCommand": "npm.cmd run-script build",
-      "StartCommand": "npm.cmd run-script start"
+      "BuildCommand": "npx expo prebuild",
+      "StartCommand": "npm run start"
     }
-  },
-  "providers": [
-    "awscloudformation"
-  ]
+  }
 }
